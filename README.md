@@ -120,13 +120,25 @@ http://localhost:8080
 ## 📸 Screenshots
 
 ### Home Page
-(Add Screenshot Here)
+![Home Page](./screenshots/wanderlust_homePage.png)
 
 ### Listing Page
-(Add Screenshot Here)
+![Listing Page](./screenshots/listing.png)
 
-### Interactive Map
-(Add Screenshot Here)
+### Map
+![Map](./screenshots/map.png)
+
+### Login
+![Login](./screenshots/logIn.png)
+
+### Signup
+![Signup](./screenshots/signUp.png)
+
+### Ratings
+![Ratings](./screenshots/ratings.png)
+
+### Add New Listing
+![Add Listing](./screenshots/addNewListings.png)
 
 ---
 
