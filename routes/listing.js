@@ -9,9 +9,6 @@ const listingController = require("../controllers/listings.js");
 const multer = require("multer");
 const { storage } = require("../cloudConfig.js");
 
-const initData = require("../init/data.js");
-const Listing = require("../models/listing.js");
-
 const upload = multer({ storage });
 
 router
@@ -39,30 +36,6 @@ router.get(
   "/search",
   wrapAsync(listingController.searchListings)
 );
-
-router.get("/init", async (req, res) => {
-  try {
-    await Listing.deleteMany({});
-
-    const sampleListings = initData.data.map((obj) => ({
-      ...obj,
-
-      owner: "66567b03fda820235197b582",
-
-      geometry: {
-        type: "Point",
-        coordinates: [77.2090, 28.6139],
-      },
-    }));
-
-    await Listing.insertMany(sampleListings);
-
-    res.send("Database Initialized Successfully!");
-  } catch (err) {
-    console.log(err);
-    res.send("Error Initializing Database");
-  }
-});
 
 router
   .route("/:id")
