@@ -1,4 +1,4 @@
-const axios = require("axios");
+const getCoordinates = require("../utils/geocoding");
 
 const Listing = require("../models/listing");
 
@@ -59,34 +59,10 @@ module.exports.createListing = async (req, res) => {
   let url = req.file.path;
   let filename = req.file.filename;
 
-  const response = await axios.get(
-    "https://nominatim.openstreetmap.org/search",
-    {
-      params: {
-        q: `${req.body.listing.location}, ${req.body.listing.country}`,
-        format: "json",
-        limit: 1,
-      },
-      headers: {
-        "User-Agent": "wanderlust-app",
-      },
-    }
+  const geometry = await getCoordinates(
+    req.body.listing.location,
+    req.body.listing.country
   );
-
-  let geometry = {
-    type: "Point",
-    coordinates: [73.8567, 18.5204],
-  };
-
-  if (response.data.length > 0) {
-    geometry = {
-      type: "Point",
-      coordinates: [
-        parseFloat(response.data[0].lon),
-        parseFloat(response.data[0].lat),
-      ],
-    };
-  }
 
   const newListing = new Listing(req.body.listing);
 
@@ -128,34 +104,10 @@ module.exports.updateListing = async (req, res) => {
 
   let { id } = req.params;
 
-  const response = await axios.get(
-    "https://nominatim.openstreetmap.org/search",
-    {
-      params: {
-        q: `${req.body.listing.location}, ${req.body.listing.country}`,
-        format: "json",
-        limit: 1,
-      },
-      headers: {
-        "User-Agent": "wanderlust-app",
-      },
-    }
+  const geometry = await getCoordinates(
+    req.body.listing.location,
+    req.body.listing.country
   );
-
-  let geometry = {
-    type: "Point",
-    coordinates: [73.8567, 18.5204],
-  };
-
-  if (response.data.length > 0) {
-    geometry = {
-      type: "Point",
-      coordinates: [
-        parseFloat(response.data[0].lon),
-        parseFloat(response.data[0].lat),
-      ],
-    };
-  }
 
   req.body.listing.geometry = geometry;
 
