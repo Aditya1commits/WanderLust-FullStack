@@ -90,6 +90,22 @@ app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
+const initData = require("./init/data.js");
+const Listing = require("./models/listing.js");
+
+app.get("/init", async (req, res) => {
+  await Listing.deleteMany({});
+
+  const sampleListings = initData.data.map((obj) => ({
+    ...obj,
+    owner: "66567b03fda820235197b582",
+  }));
+
+  await Listing.insertMany(sampleListings);
+
+  res.send("Database Initialized!");
+});
+
 app.all("*", (req, res, next) => {
   next(new ExpressError(404, "Page Not Found!"));
 });
