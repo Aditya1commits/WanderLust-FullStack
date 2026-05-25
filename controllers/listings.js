@@ -1,3 +1,5 @@
+const axios = require("axios");
+
 const Listing = require("../models/listing");
 
 module.exports.index = async (req, res) => {
@@ -53,8 +55,38 @@ module.exports.showListing = async (req, res) => {
 };
 
 module.exports.createListing = async (req, res) => {
+
   let url = req.file.path;
   let filename = req.file.filename;
+
+  const response = await axios.get(
+    "https://nominatim.openstreetmap.org/search",
+    {
+      params: {
+        q: `${req.body.listing.location}, ${req.body.listing.country}`,
+        format: "json",
+        limit: 1,
+      },
+      headers: {
+        "User-Agent": "wanderlust-app",
+      },
+    }
+  );
+
+  let geometry = {
+    type: "Point",
+    coordinates: [73.8567, 18.5204],
+  };
+
+  if (response.data.length > 0) {
+    geometry = {
+      type: "Point",
+      coordinates: [
+        parseFloat(response.data[0].lon),
+        parseFloat(response.data[0].lat),
+      ],
+    };
+  }
 
   const newListing = new Listing(req.body.listing);
 
@@ -62,11 +94,7 @@ module.exports.createListing = async (req, res) => {
 
   newListing.image = { filename, url };
 
-  // Static coordinates (Pune)
-  newListing.geometry = {
-    type: "Point",
-    coordinates: [73.8567, 18.5204],
-  };
+  newListing.geometry = geometry;
 
   await newListing.save();
 
@@ -97,18 +125,47 @@ module.exports.renderEditForm = async (req, res) => {
 };
 
 module.exports.updateListing = async (req, res) => {
+
   let { id } = req.params;
 
-  req.body.listing.geometry = {
+  const response = await axios.get(
+    "https://nominatim.openstreetmap.org/search",
+    {
+      params: {
+        q: `${req.body.listing.location}, ${req.body.listing.country}`,
+        format: "json",
+        limit: 1,
+      },
+      headers: {
+        "User-Agent": "wanderlust-app",
+      },
+    }
+  );
+
+  let geometry = {
     type: "Point",
     coordinates: [73.8567, 18.5204],
   };
 
-  let updatedListing = await Listing.findByIdAndUpdate(id, {
-    ...req.body.listing,
-  });
+  if (response.data.length > 0) {
+    geometry = {
+      type: "Point",
+      coordinates: [
+        parseFloat(response.data[0].lon),
+        parseFloat(response.data[0].lat),
+      ],
+    };
+  }
+
+  req.body.listing.geometry = geometry;
+
+  let updatedListing = await Listing.findByIdAndUpdate(
+    id,
+    { ...req.body.listing }
+  );
 
   if (typeof req.file !== "undefined") {
+
     let url = req.file.path;
     let filename = req.file.filename;
 
