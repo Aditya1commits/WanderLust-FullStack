@@ -40,14 +40,19 @@ router.get(
   wrapAsync(listingController.searchListings)
 );
 
-// INIT DATABASE ROUTE
 router.get("/init", async (req, res) => {
   try {
     await Listing.deleteMany({});
 
     const sampleListings = initData.data.map((obj) => ({
       ...obj,
+
       owner: "66567b03fda820235197b582",
+
+      geometry: {
+        type: "Point",
+        coordinates: [77.2090, 28.6139],
+      },
     }));
 
     await Listing.insertMany(sampleListings);
